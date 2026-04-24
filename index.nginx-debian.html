@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Warehouse RFID System</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #eaf0f7;
+      color: #16324f;
+    }
+    .hidden { display: none !important; }
+
+    :root{
+      --blue:#1f4e98;
+      --blue2:#356fd0;
+      --soft:#f7faff;
+      --line:#dfe7f1;
+      --card:#ffffff;
+      --text:#17324f;
+      --muted:#6f839b;
+      --warn:#f0aa3b;
+      --warn-bg:#fff4e5;
+      --danger:#de6d6d;
+      --danger-bg:#fff1f1;
+      --ok-bg:#eef4ff;
+    }
+
+    .primary-btn, .ghost-btn {
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 15px;
+      transition: .2s ease;
+    }
+    .primary-btn {
+      border: 0;
+      color: #fff;
+      background: linear-gradient(180deg, var(--blue), var(--blue2));
+      box-shadow: 0 10px 20px rgba(31,78,152,.18);
+    }
+    .ghost-btn {
+      border: 1px solid #d6e1ed;
+      background: #fff;
+      color: var(--blue);
+    }
+    .primary-btn:hover, .ghost-btn:hover { transform: translateY(-1px); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge-ok { background: var(--ok-bg); color: var(--blue); }
+    .badge-warn { background: var(--warn-bg); color: #cf7f00; }
+    .badge-danger { background: var(--danger-bg); color: #d94f4f; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 10px 24px rgba(25,52,77,.05);
+    }
+
+    /* Login / Register */
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background: linear-gradient(180deg, #eef4fb, #dfe7f2);
+    }
+    .login-shell {
+      width: 100%;
+      max-width: 1180px;
+      min-height: 720px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      overflow: hidden;
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: 0 16px 40px rgba(20,40,70,.12);
+    }
+    .login-left {
+      background: linear-gradient(180deg, #183d78, #2758a7);
+      color: #fff;
+      padding: 34px 38px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .brand-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,.16);
+      font-weight: 800;
+      font-size: 26px;
+      color: #fff;
+    }
+    .login-left h1 {
+      font-size: 58px;
+      line-height: 1.08;
+      margin: 0 0 18px;
+      max-width: 600px;
+    }
+    .login-left p {
+      font-size: 18px;
+      line-height: 1.8;
+      color: rgba(255,255,255,.92);
+      max-width: 680px;
+      margin: 0;
+    }
+    .hero-features {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+    .hero-pill {
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.2);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .hero-mini-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .hero-mini-card {
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 110px;
+    }
+    .hero-mini-card strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .hero-mini-card span {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255,255,255,.9);
+    }
+    .login-right {
+      padding: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fbff;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 460px;
+    }
+    .login-card h2 {
+      font-size: 54px;
+      line-height: 1.1;
+      margin: 0 0 12px;
+      color: var(--blue);
+    }
+    .login-card p {
+      color: var(--muted);
+      line-height: 1.8;
+      margin: 0 0 28px;
+      font-size: 17px;
+    }
+    .field {
+      margin-bottom: 18px;
+    }
+    .field label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+    .field input {
+      width: 100%;
+      padding: 18px 18px;
+      border-radius: 16px;
+      border: 1px solid #d7e2ee;
+      background: #fff;
+      font-size: 17px;
+      outline: none;
+    }
+    .field input:focus {
+      border-color: #8fb2ee;
+      box-shadow: 0 0 0 4px rgba(91,149,255,.12);
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    /* App layout */
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+    }
+    .sidebar {
+      background: #fff;
+      border-right: 1px solid var(--line);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px 16px;
+    }
+    .sidebar .nav {
+      display: grid;
+      gap: 8px;
+    }
+    .nav-btn {
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 18px;
+      text-align: left;
+      border-radius: 16px;
+      padding: 14px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-btn.active,
+    .nav-btn:hover {
+      background: #eef4ff;
+      color: var(--blue);
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .topbar {
+      background: linear-gradient(180deg, #214d93, #2e63bb);
+      color: #fff;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .search-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      padding: 10px 14px;
+      min-width: 280px;
+    }
+    .search-pill input {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      outline: none;
+      font-size: 14px;
+    }
+    .search-pill input::placeholder { color: rgba(255,255,255,.78); }
+
+    .content {
+      padding: 26px 28px 36px;
+    }
+    .page-title {
+      font-size: 56px;
+      color: var(--blue);
+      margin: 0 0 10px;
+    }
+    .page-sub {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 22px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 14px;
+    }
+    .summary-card {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fbfcff;
+    }
+    .summary-card .label {
+      color: #6881a0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .summary-card .value {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--blue);
+      margin-top: 8px;
+    }
+    .summary-card .note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .table-wrap { overflow: auto; }
+    table.table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+    .table th {
+      text-align: left;
+      background: #eef4fb;
+      color: #2b4e7c;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 16px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .table td {
+      padding: 18px 16px;
+      border-bottom: 1px solid #edf2f7;
+      vertical-align: middle;
+    }
+    .table tr:last-child td { border-bottom: 0; }
+
+    .prod-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .prod-thumb {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: #edf4ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .edit-icon, .del-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid #dce6f0;
+      background: #fff;
+      cursor: pointer;
+      margin-right: 8px;
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .fab {
+      position: absolute;
+      right: 24px;
+      bottom: 22px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      font-size: 34px;
+      background: linear-gradient(180deg, var(--blue), var(--blue2));
+      box-shadow: 0 10px 22px rgba(31,78,152,.22);
+    }
+
+    .transaction-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+    .transaction-tabs .tab-btn {
+      padding: 10px 18px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .transaction-tabs .tab-btn.active {
+      background: #eef4ff;
+      color: var(--blue);
+      border-color: #d9e6fb;
+    }
+
+    .form-card {
+      padding: 32px 32px 28px;
+      border-radius: 24px;
+      border: 1px solid #dfe6ef;
+      box-shadow: 0 10px 24px rgba(25,52,77,.06);
+    }
+    .form-title {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .section-card {
+      padding: 18px 20px;
+      border: 1px solid #e6edf5;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #fbfcff, #f7faff);
+      display: grid;
+      gap: 16px;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .section-title {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .section-name {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--blue);
+      margin-top: 4px;
+    }
+    .transaction-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 14px;
+    }
+    .transaction-form-grid input {
+      padding: 16px 18px;
+      border: 1px solid #d7e2ee;
+      background: #fff;
+      border-radius: 16px;
+      font-size: 16px;
+      outline: none;
+      color: var(--text);
+    }
+    .transaction-form-grid input:focus {
+      border-color: #8fb2ee;
+      box-shadow: 0 0 0 4px rgba(91,149,255,.12);
+    }
+    .save-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+
+    .history-top {
+      padding: 18px 20px;
+      border-bottom: 1px solid #e8eef5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: #fbfcff;
+    }
+    .history-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(16,31,54,.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+    .modal {
+      width: 100%;
+      max-width: 860px;
+      background: #fff;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      box-shadow: 0 20px 40px rgba(0,0,0,.2);
+      padding: 26px;
+      max-height: 92vh;
+      overflow: auto;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .detail-box {
+      padding: 14px 16px;
+      border: 1px solid #e5ecf5;
+      border-radius: 14px;
+      background: #fbfcff;
+    }
+    .detail-box .label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .detail-box .value {
+      margin-top: 6px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    @media (max-width: 1100px) {
+      .login-shell { grid-template-columns: 1fr; }
+      .hero-mini-cards { grid-template-columns: 1fr; }
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 720px) {
+      .page-title { font-size: 40px; }
+      .summary-grid,
+      .transaction-form-grid,
+      .detail-grid { grid-template-columns: 1fr; }
+      .content { padding: 20px; }
+      .login-left h1 { font-size: 38px; }
+      .topbar { padding: 16px; }
+      .search-pill { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="loginPage" class="login-page">
+    <div class="login-shell">
+      <div class="login-left">
+        <div>
+          <div class="brand-top">
+            <div class="logo">TK</div>
+            <div>
+              <div style="font-size:18px;font-weight:800;">Smart Warehouse RFID System</div>
+              <div style="font-size:14px;color:rgba(255,255,255,.9);margin-top:4px;">RFID dashboard and inventory control</div>
+            </div>
+          </div>
+          <h1>จัดการสินค้า<br>ค้นหาด้วย RFID และ<br>ติดตามคลังในระบบเดียว</h1>
+          <p>ระบบนี้ออกแบบเพื่อให้ผู้ใช้สามารถดูข้อมูลสินค้า ตำแหน่งจัดเก็บ Zone / Shelf ตรวจสอบ RFID Tag และติดตามการรับเข้า-เบิกออกได้ในหน้าเดียว</p>
+          <div class="hero-features">
+            <div class="hero-pill">Inventory</div>
+            <div class="hero-pill">Transactions</div>
+            <div class="hero-pill">RFID Tracking</div>
+          </div>
+          <div class="hero-mini-cards">
+            <div class="hero-mini-card"><strong>SKU</strong><span>จัดเก็บรหัสสินค้าและราคา</span></div>
+            <div class="hero-mini-card"><strong>Zone / Shelf</strong><span>ติดตามตำแหน่งจัดเก็บและความจุ</span></div>
+            <div class="hero-mini-card"><strong>RFID</strong><span>ดูแท็กและสถานะ In-Stock / Moving / Shipped</span></div>
+          </div>
+        </div>
+        <p>เหมาะสำหรับต้นแบบระบบคลังสินค้าอัจฉริยะที่รวมข้อมูลสินค้า ตำแหน่งจัดเก็บ RFID และธุรกรรมเข้า-ออกไว้ในระบบเดียว</p>
+      </div>
+      <div class="login-right">
+        <div class="login-card">
+          <h2>เข้าสู่ระบบ</h2>
+          <p>กรอกข้อมูลเพื่อเข้าใช้งานระบบจัดการคลังสินค้า Smart Warehouse RFID System</p>
+          <div class="field">
+            <label>อีเมล</label>
+            <input id="loginEmail" placeholder="warehouse@company.com" />
+          </div>
+          <div class="field">
+            <label>รหัสผ่าน</label>
+            <input id="loginPassword" type="password" placeholder="••••••••" />
+          </div>
+          <div class="actions">
+            <button class="primary-btn" onclick="enterApp()">Login</button>
+            <button class="ghost-btn" onclick="openRegisterPage()">สมัครสมาชิก</button>
+          </div>
+          <p style="margin-top:16px;font-size:14px">ยังไม่มีบัญชี? สมัครสมาชิกเพื่อเริ่มใช้งานระบบ</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="registerPage" class="login-page hidden">
+    <div class="login-shell">
+      <div class="login-left">
+        <div>
+          <div class="brand-top">
+            <div class="logo">TK</div>
+            <div>
+              <div style="font-size:18px;font-weight:800;">Smart Warehouse RFID System</div>
+              <div style="font-size:14px;color:rgba(255,255,255,.9);margin-top:4px;">Create a new account</div>
+            </div>
+          </div>
+          <h1>สมัครสมาชิกเพื่อ<br>เข้าใช้ระบบจัดการ<br>คลังสินค้า RFID</h1>
+          <p>สร้างบัญชีใหม่สำหรับพนักงานหรือผู้ดูแลระบบ เพื่อเข้าใช้งาน Inventory, Employees และ Transactions</p>
+          <div class="hero-features">
+            <div class="hero-pill">สร้างบัญชีพนักงาน</div>
+            <div class="hero-pill">กำหนดข้อมูลผู้ใช้</div>
+            <div class="hero-pill">เริ่มใช้งานทันที</div>
+          </div>
+          <div class="hero-mini-cards">
+            <div class="hero-mini-card"><strong>Account</strong><span>กำหนดชื่อและอีเมลสำหรับเข้าสู่ระบบ</span></div>
+            <div class="hero-mini-card"><strong>Role</strong><span>ใช้ต่อยอดกำหนดสิทธิ์การใช้งานในอนาคต</span></div>
+            <div class="hero-mini-card"><strong>Access</strong><span>เชื่อมเข้าสู่หน้า dashboard ได้ทันทีหลังสมัคร</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="login-right">
+        <div class="login-card">
+          <h2>สมัครสมาชิก</h2>
+          <p>กรอกข้อมูลผู้ใช้งานเพื่อสร้างบัญชีใหม่</p>
+          <div class="field">
+            <label>ชื่อผู้ใช้งาน</label>
+            <input id="registerName" placeholder="ชื่อ - นามสกุล" />
+          </div>
+          <div class="field">
+            <label>อีเมล</label>
+            <input id="registerEmail" placeholder="name@company.com" />
+          </div>
+          <div class="field">
+            <label>รหัสผ่าน</label>
+            <input id="registerPassword" type="password" placeholder="••••••••" />
+          </div>
+          <div class="field">
+            <label>ยืนยันรหัสผ่าน</label>
+            <input id="registerConfirmPassword" type="password" placeholder="••••••••" />
+          </div>
+          <div class="actions">
+            <button class="primary-btn" onclick="submitRegister()">สร้างบัญชี</button>
+            <button class="ghost-btn" onclick="backToLogin()">กลับไปหน้า Login</button>
+          </div>
+          <div id="registerMsg" style="margin-top:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo" style="background:linear-gradient(180deg,#1f4e98,#356fd0);">TK</div>
+        <div>
+          <div style="font-weight:800;">Smart Warehouse</div>
+          <div style="font-size:13px;color:var(--muted);">RFID System</div>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button id="nav-home" class="nav-btn active" onclick="showPage('home')">🏠 Home</button>
+        <button id="nav-inventory" class="nav-btn" onclick="showPage('inventory')">📦 Inventory</button>
+        <button id="nav-employees" class="nav-btn" onclick="showPage('employees')">👥 Employees</button>
+        <button id="nav-transactions" class="nav-btn" onclick="showPage('transactions')">💳 Transactions</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="logo" style="width:44px;height:44px;font-size:22px;">TK</div>
+          <div>
+            <div style="font-weight:800;font-size:16px;">Smart Warehouse RFID System</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.88);margin-top:3px;">RFID dashboard and inventory control</div>
+          </div>
+        </div>
+        <div class="search-pill">
+          <span>⌕</span>
+          <input placeholder="Search product, SKU, RFID tag" />
+        </div>
+      </div>
+
+      <div class="content">
+        <!-- HOME -->
+        <section id="home" class="page-view">
+          <h2 class="page-title">Home</h2>
+          <div class="page-sub">ภาพรวมระบบคลังสินค้า RFID พร้อมข้อมูลสินค้า ตำแหน่งจัดเก็บ และธุรกรรมล่าสุด</div>
+
+          <div class="summary-grid">
+            <div class="summary-card card">
+              <div class="label">Products</div>
+              <div class="value">5</div>
+              <div class="note">รายการสินค้าทั้งหมดในระบบ</div>
+            </div>
+            <div class="summary-card card">
+              <div class="label">RFID Tags</div>
+              <div class="value">5</div>
+              <div class="note">แท็ก RFID ที่เชื่อมกับสินค้า</div>
+            </div>
+            <div class="summary-card card" style="background:#fff8ef;">
+              <div class="label" style="color:#b07a1f;">Storage Zones</div>
+              <div class="value" style="color:#d78b1a;">4</div>
+              <div class="note" style="color:#b07a1f;">A, B, C, D</div>
+            </div>
+            <div class="summary-card card" style="background:#eef4ff;">
+              <div class="label" style="color:#356fd0;">Stock Movement</div>
+              <div class="value" style="color:#1f4e98;">9</div>
+              <div class="note" style="color:#356fd0;">เปลี่ยนจำนวนผ่าน Buy / Sell</div>
+            </div>
+          </div>
+
+          <div style="height:18px;"></div>
+
+          <div class="card" style="padding:22px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+              <h3 style="margin:0;font-size:28px;">RFID Status Overview</h3>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <span class="badge badge-ok">In-Stock</span>
+                <span class="badge badge-warn">Moving</span>
+                <span class="badge badge-danger">Shipped</span>
+              </div>
+            </div>
+            <div style="display:grid;gap:16px;">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-weight:800;color:#2c4b76;margin-bottom:8px;"><span>In-Stock</span><span>3 รายการ</span></div>
+                <div style="height:14px;border-radius:999px;background:#edf2f7;overflow:hidden;"><div style="width:60%;height:100%;background:linear-gradient(90deg,#1f4e98,#5b95ff);"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-weight:800;color:#2c4b76;margin-bottom:8px;"><span>Moving</span><span>1 รายการ</span></div>
+                <div style="height:14px;border-radius:999px;background:#edf2f7;overflow:hidden;"><div style="width:20%;height:100%;background:linear-gradient(90deg,#f0aa3b,#ffd067);"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-weight:800;color:#2c4b76;margin-bottom:8px;"><span>Shipped</span><span>1 รายการ</span></div>
+                <div style="height:14px;border-radius:999px;background:#edf2f7;overflow:hidden;"><div style="width:20%;height:100%;background:linear-gradient(90deg,#de6d6d,#f39d9d);"></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- INVENTORY -->
+        <section id="inventory" class="page-view hidden">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:24px;">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#7b8ea3;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px;">Data Group Management</div>
+              <h2 class="page-title" style="margin-bottom:8px;">Inventory</h2>
+              <div class="page-sub" style="margin-bottom:0;">หน้านี้ใช้สำหรับตรวจสอบข้อมูลสินค้า SKU ราคา ตำแหน่งจัดเก็บ Shelf ID ความจุ RFID Tag และสถานะสินค้าเท่านั้น</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+              <button class="ghost-btn">Export</button>
+              <button class="primary-btn">View Only</button>
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px;margin-bottom:22px;">
+            <div class="summary-grid">
+              <div class="summary-card">
+                <div class="label">All Products</div>
+                <div class="value">5</div>
+                <div class="note">ลิปโกลว์ / เซรั่ม / กระเป๋า / แก้ว / ชั้นวาง</div>
+              </div>
+              <div class="summary-card">
+                <div class="label">RFID Tags</div>
+                <div class="value">5</div>
+                <div class="note">RFID-GL-001 ถึง RFID-HM-021</div>
+              </div>
+              <div class="summary-card" style="background:#fff8ef;">
+                <div class="label" style="color:#b07a1f;">Storage Zones</div>
+                <div class="value" style="color:#d78b1a;">4</div>
+                <div class="note" style="color:#b07a1f;">A-12, A-08, B-04, C-09, D-02</div>
+              </div>
+              <div class="summary-card" style="background:#eef4ff;">
+                <div class="label" style="color:#356fd0;">Stock Movement</div>
+                <div class="value" style="color:#1f4e98;">9</div>
+                <div class="note" style="color:#356fd0;">เปลี่ยนจำนวนผ่าน Buy / Sell</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:18px;">
+            <div style="display:flex;align-items:center;gap:10px;background:#f5f8fc;border:1px solid #e1e9f3;padding:10px 14px;border-radius:999px;min-width:280px;max-width:360px;width:100%;">
+              <span style="color:#7b8ea3;">⌕</span>
+              <input id="inventorySearchInput" placeholder="Search product, SKU, RFID tag" oninput="searchInventory()" style="width:100%;border:0;outline:0;background:transparent;font-size:14px;color:#19344d;" />
+            </div>
+          </div>
+
+          <div class="card" style="overflow:hidden;position:relative;">
+            <div style="padding:16px 18px;border-bottom:1px solid #e8eef5;background:#fbfcff;">
+              <div style="font-size:16px;font-weight:800;color:#19344d;">Product / RFID List</div>
+              <div style="font-size:12px;color:#7b8ea3;font-weight:700;margin-top:4px;">ตัวอย่างข้อมูลสินค้า SKU RFID Zone Shelf และสถานะ</div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table" id="inventoryTable">
+                <thead>
+                  <tr>
+                    <th style="width:110px"></th>
+                    <th>Product</th>
+                    <th>RFID Tag</th>
+                    <th>Zone / Shelf</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- EMPLOYEES -->
+        <section id="employees" class="page-view hidden">
+          <h2 class="page-title">Employees</h2>
+          <div class="card" style="overflow:hidden;position:relative;">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width:110px"></th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><button class="edit-icon">✎</button><button class="del-icon">🗑</button></td>
+                    <td>Somchai Prasert</td>
+                    <td>Inbound Checking</td>
+                    <td>somchai.rfid@example.com</td>
+                    <td>081-245-7631</td>
+                  </tr>
+                  <tr>
+                    <td><button class="edit-icon">✎</button><button class="del-icon">🗑</button></td>
+                    <td>Orathai Suksan</td>
+                    <td>RFID Scanning / Moving</td>
+                    <td>orathai.rfid@example.com</td>
+                    <td>082-918-4402</td>
+                  </tr>
+                  <tr>
+                    <td><button class="edit-icon">✎</button><button class="del-icon">🗑</button></td>
+                    <td>Pitchit Anurak</td>
+                    <td>Shelf Capacity Review</td>
+                    <td>pitchit.rfid@example.com</td>
+                    <td>089-334-1208</td>
+                  </tr>
+                  <tr>
+                    <td><button class="edit-icon">✎</button><button class="del-icon">🗑</button></td>
+                    <td>Ratchanee Boonsri</td>
+                    <td>Outbound Approval</td>
+                    <td>ratchanee.rfid@example.com</td>
+                    <td>086-771-5534</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button class="fab">+</button>
+          </div>
+        </section>
+
+        <!-- TRANSACTIONS -->
+        <section id="transactions" class="page-view hidden">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:24px;">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#7b8ea3;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px;">Inbound / Outbound Data</div>
+              <h2 class="page-title" style="margin-bottom:8px;">Transactions</h2>
+              <div class="page-sub" style="margin-bottom:0;">หน้านี้ใช้สำหรับรับสินค้าเข้า (Buy) และเบิกสินค้าออก (Sell) ซึ่งเป็นส่วนที่ทำให้จำนวนสินค้าใน Inventory เพิ่มขึ้นหรือลดลง พร้อมบันทึก PO ใบเบิก วันเวลาเข้า-ออก และผู้รับผิดชอบ</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+              <button class="ghost-btn">Export History</button>
+              <button class="primary-btn">Buy / Sell Control</button>
+            </div>
+          </div>
+
+          <div class="summary-grid" style="margin-bottom:24px;">
+            <div class="summary-card card">
+              <div class="label">PO Records</div>
+              <div class="value">18</div>
+              <div class="note">รับสินค้าเข้าระบบ</div>
+            </div>
+            <div class="summary-card card">
+              <div class="label">Issue Records</div>
+              <div class="value">24</div>
+              <div class="note">เบิกสินค้าออกจากคลัง</div>
+            </div>
+            <div class="summary-card card">
+              <div class="label">Responsible Staff</div>
+              <div class="value">4</div>
+              <div class="note">พนักงานที่เกี่ยวข้อง</div>
+            </div>
+            <div class="summary-card card">
+              <div class="label">Time Logs</div>
+              <div class="value">9</div>
+              <div class="note">รายการอัปเดตวันนี้</div>
+            </div>
+          </div>
+
+          <div class="transaction-tabs">
+            <button id="tab-buy" class="tab-btn active" onclick="showTransactionTab('buy')">Buy</button>
+            <button id="tab-sell" class="tab-btn" onclick="showTransactionTab('sell')">Sell</button>
+            <button id="tab-history" class="tab-btn" onclick="showTransactionTab('history')">History</button>
+          </div>
+
+          <!-- BUY -->
+          <div id="transactionBuy" class="card form-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+              <h3 class="form-title">Buy Items</h3>
+              <span class="badge badge-ok">แบบฟอร์มรับเข้า</span>
+            </div>
+
+            <div class="section-card" style="margin-bottom:18px;">
+              <div class="section-head">
+                <div>
+                  <div class="section-title">ส่วนข้อมูลผู้ขาย</div>
+                  <div class="section-name">ข้อมูลผู้ขาย / Supplier</div>
+                </div>
+                <span class="badge badge-ok">จำเป็น</span>
+              </div>
+              <div class="transaction-form-grid">
+                <input id="buySupplier" placeholder="ชื่อผู้ขาย">
+                <input id="buyPhone" placeholder="เบอร์โทร">
+                <input id="buyAddress" placeholder="ที่อยู่" style="grid-column:1/-1;">
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head">
+                <div>
+                  <div class="section-title">ส่วนข้อมูลสินค้า</div>
+                  <div class="section-name">ข้อมูลสินค้าเข้า</div>
+                </div>
+                <span class="badge badge-warn">เชื่อมกับสต็อก</span>
+              </div>
+              <div class="transaction-form-grid">
+                <input id="buyProduct" placeholder="ชื่อสินค้า / SKU / RFID Tag" style="grid-column:1/-1;">
+                <input id="buyPrice" placeholder="ราคา">
+                <input id="buyItems" placeholder="จำนวน">
+                <input id="buyZone" placeholder="Zone เช่น A-08">
+                <input id="buyShelf" placeholder="Shelf ID เช่น C5">
+                <input id="buyDate" placeholder="เลขที่ PO / วันที่รับเข้า" style="grid-column:1/-1;">
+              </div>
+            </div>
+            <div class="save-row">
+              <button class="primary-btn" onclick="saveTransaction('buy')">บันทึกรายการรับเข้า</button>
+            </div>
+            <div id="buyMsg" style="margin-top:12px;"></div>
+          </div>
+
+          <!-- SELL -->
+          <div id="transactionSell" class="card form-card hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+              <h3 class="form-title">Sell Items</h3>
+              <span class="badge badge-warn">แบบฟอร์มเบิกออก</span>
+            </div>
+
+            <div class="section-card" style="margin-bottom:18px;">
+              <div class="section-head">
+                <div>
+                  <div class="section-title">ส่วนข้อมูลผู้ขอเบิก</div>
+                  <div class="section-name">ข้อมูลผู้ขอเบิก / ลูกค้า</div>
+                </div>
+                <span class="badge badge-ok">จำเป็น</span>
+              </div>
+              <div class="transaction-form-grid">
+                <input id="sellCustomer" placeholder="ชื่อผู้ขอเบิก / ลูกค้า">
+                <input id="sellPhone" placeholder="เบอร์โทร">
+                <input id="sellAddress" placeholder="ที่อยู่" style="grid-column:1/-1;">
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head">
+                <div>
+                  <div class="section-title">ส่วนข้อมูลสินค้า</div>
+                  <div class="section-name">ข้อมูลสินค้าเบิกออก</div>
+                </div>
+                <span class="badge badge-warn">เชื่อมกับสต็อก</span>
+              </div>
+              <div class="transaction-form-grid">
+                <input id="sellProduct" placeholder="ชื่อสินค้า / SKU / RFID Tag" style="grid-column:1/-1;">
+                <input id="sellPrice" placeholder="ราคา">
+                <input id="sellItems" placeholder="จำนวน">
+                <input id="sellZone" placeholder="Zone เช่น B-04">
+                <input id="sellShelf" placeholder="Shelf ID เช่น A1">
+                <input id="sellDate" placeholder="เลขที่เบิก / วันที่เบิกออก" style="grid-column:1/-1;">
+              </div>
+            </div>
+            <div class="save-row">
+              <button class="primary-btn" onclick="saveTransaction('sell')">บันทึกรายการเบิกออก</button>
+            </div>
+            <div id="sellMsg" style="margin-top:12px;"></div>
+          </div>
+
+          <!-- HISTORY -->
+          <div id="transactionHistory" class="card hidden" style="overflow:hidden;">
+            <div class="history-top">
+              <div class="history-title">Inbound / Outbound History</div>
+              <div style="display:flex;align-items:center;gap:10px;background:#f5f8fc;border:1px solid #e1e9f3;padding:10px 14px;border-radius:999px;min-width:280px;max-width:360px;width:100%;">
+                <span style="color:#7b8ea3;">⌕</span>
+                <input id="historySearchInput" placeholder="Search PO, issue no., product or RFID" oninput="renderTransactionHistory()" style="width:100%;border:0;outline:0;background:transparent;font-size:14px;color:#19344d;" />
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Type</th>
+                  </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- TRANSACTION DETAIL MODAL -->
+  <div id="transactionDetailModal" class="modal-backdrop hidden">
+    <div class="modal">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:13px;color:#7b8ea3;font-weight:700;letter-spacing:.04em;text-transform:uppercase;">Transaction Detail</div>
+          <h3 style="margin:8px 0 0;font-size:30px;color:#183a6d;">รายละเอียดรายการ</h3>
+        </div>
+        <button class="ghost-btn" onclick="closeTransactionDetail()">Close</button>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-box"><div class="label">Order No.</div><div id="detailOrder" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Date</div><div id="detailDate" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Product</div><div id="detailProduct" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Items</div><div id="detailItems" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Price</div><div id="detailPrice" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Type</div><div id="detailType" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Buyer / Supplier</div><div id="detailBuyer" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Seller / System</div><div id="detailSeller" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Contact</div><div id="detailContact" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Zone</div><div id="detailZone" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Shelf ID</div><div id="detailShelf" class="value">-</div></div>
+        <div class="detail-box"><div class="label">Status</div><div id="detailStatus" class="value">-</div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const inventoryItems = [
+      { name: 'ลิปโกลว์เปลี่ยนสี', sku:'SKU-1208', items: 25, price: '฿129.00', zone:'A-12', shelf:'B3', capacity:'60', rfid:'RFID-GL-001', status:'In-Stock', emoji:'💄' },
+      { name: 'เซรั่มหน้าใส', sku:'SKU-9015', items: 66, price: '฿189.00', zone:'A-08', shelf:'C5', capacity:'80', rfid:'RFID-SK-030', status:'Moving', emoji:'🧴' },
+      { name: 'กระเป๋าสะพายมินิมอล', sku:'SKU-2031', items: 3, price: '฿259.00', zone:'B-04', shelf:'A1', capacity:'20', rfid:'RFID-BG-014', status:'Shipped', emoji:'👜' },
+      { name: 'แก้วน้ำเก็บอุณหภูมิ', sku:'SKU-7120', items: 120, price: '฿219.00', zone:'D-02', shelf:'A6', capacity:'150', rfid:'RFID-CP-008', status:'In-Stock', emoji:'🥤' },
+      { name: 'ชั้นวางของมินิ 3 ชั้น', sku:'SKU-3382', items: 15, price: '฿399.00', zone:'C-09', shelf:'D2', capacity:'25', rfid:'RFID-HM-021', status:'In-Stock', emoji:'🗄️' }
+    ];
+
+    const transactionHistory = [
+      { id:1, date:'25 Dec 2020', product:'ลิปโกลว์เปลี่ยนสี', items:25, price:'฿129.00', type:'Buy', buyer:'TikTok Supplier Hub', seller:'Smart Warehouse Store', contact:'081-245-7631', order:'PO-100445', status:'Recorded', zone:'A-12', shelf:'B3' },
+      { id:2, date:'26 Dec 2020', product:'เซรั่มหน้าใส', items:66, price:'฿189.00', type:'Sell', buyer:'คุณพิมพ์ชนก', seller:'Smart Warehouse Store', contact:'082-918-4402', order:'SO-200118', status:'Pending Review', zone:'A-08', shelf:'C5' },
+      { id:3, date:'26 Dec 2020', product:'กระเป๋าสะพายมินิมอล', items:3, price:'฿259.00', type:'Buy', buyer:'Bag Supplier Center', seller:'Smart Warehouse Store', contact:'089-334-1208', order:'PO-200229', status:'Recorded', zone:'B-04', shelf:'A1' },
+      { id:4, date:'26 Dec 2020', product:'แก้วน้ำเก็บอุณหภูมิ', items:120, price:'฿219.00', type:'Sell', buyer:'คุณธัญชนก', seller:'Smart Warehouse Store', contact:'086-771-5534', order:'SO-200221', status:'Pending Review', zone:'D-02', shelf:'A6' },
+      { id:5, date:'27 Dec 2020', product:'ชั้นวางของมินิ 3 ชั้น', items:15, price:'฿399.00', type:'Buy', buyer:'Home Supply Hub', seller:'Smart Warehouse Store', contact:'094-662-8815', order:'PO-200902', status:'Recorded', zone:'C-09', shelf:'D2' }
+    ];
+
+    let currentPage = 'home';
+
+    function enterApp() {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('registerPage').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+      renderInventory();
+      renderTransactionHistory();
+    }
+
+    function openRegisterPage() {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('registerPage').classList.remove('hidden');
+    }
+
+    function backToLogin() {
+      document.getElementById('registerPage').classList.add('hidden');
+      document.getElementById('loginPage').classList.remove('hidden');
+    }
+
+    function submitRegister() {
+      const name = document.getElementById('registerName').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      const confirm = document.getElementById('registerConfirmPassword').value;
+      const msg = document.getElementById('registerMsg');
+
+      if (!name || !email || !password || !confirm) {
+        msg.innerHTML = '<div style="padding:12px 14px;border-radius:12px;background:#fff3f3;color:#d95a5a;font-weight:700;">กรุณากรอกข้อมูลให้ครบ</div>';
+        return;
+      }
+      if (password !== confirm) {
+        msg.innerHTML = '<div style="padding:12px 14px;border-radius:12px;background:#fff3f3;color:#d95a5a;font-weight:700;">รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน</div>';
+        return;
+      }
+
+      msg.innerHTML = '<div style="padding:12px 14px;border-radius:12px;background:#eef7ff;color:#1f4e98;font-weight:700;">สมัครสมาชิกสำเร็จ สามารถกลับไปเข้าสู่ระบบได้</div>';
+    }
+
+    function showPage(page) {
+      currentPage = page;
+      document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+      document.getElementById(page).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('nav-' + page).classList.add('active');
+
+      if (page === 'inventory') renderInventory();
+      if (page === 'transactions') renderTransactionHistory();
+    }
+
+    function renderInventory() {
+      const body = document.getElementById('inventoryBody');
+      const keyword = (document.getElementById('inventorySearchInput')?.value || '').trim().toLowerCase();
+
+      let rows = inventoryItems;
+      if (keyword) {
+        rows = rows.filter(i =>
+          [i.name, i.sku, i.rfid, i.zone, i.shelf].join(' ').toLowerCase().includes(keyword)
+        );
+      }
+
+      body.innerHTML = rows.map((item, idx) => {
+        const badge = item.status === 'Moving'
+          ? '<span class="badge badge-warn">Moving</span>'
+          : item.status === 'Shipped'
+            ? '<span class="badge badge-danger">Shipped</span>'
+            : '<span class="badge badge-ok">In-Stock</span>';
+
+        return `
+          <tr>
+            <td><button class="edit-icon">✎</button></td>
+            <td>
+              <div class="prod-cell">
+                <div class="prod-thumb">${item.emoji || '📦'}</div>
+                <div>
+                  <div style="font-weight:700;color:#19344d;">${item.name}</div>
+                  <div style="font-size:12px;color:#7b8ea3;">SKU ${item.sku} • Price ${item.price}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight:700;color:#19344d;">${item.rfid}</div>
+              <div style="font-size:12px;color:#7b8ea3;">Capacity ${item.capacity} / Current ${item.items}</div>
+            </td>
+            <td>
+              <div style="font-weight:700;color:#19344d;">${item.zone} / ${item.shelf}</div>
+              <div style="font-size:12px;color:#7b8ea3;">Storage position</div>
+            </td>
+            <td>${badge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function searchInventory() {
+      renderInventory();
+    }
+
+    function showTransactionTab(tab) {
+      document.getElementById('transactionBuy').classList.add('hidden');
+      document.getElementById('transactionSell').classList.add('hidden');
+      document.getElementById('transactionHistory').classList.add('hidden');
+
+      document.getElementById('tab-buy').classList.remove('active');
+      document.getElementById('tab-sell').classList.remove('active');
+      document.getElementById('tab-history').classList.remove('active');
+
+      if (tab === 'buy') {
+        document.getElementById('transactionBuy').classList.remove('hidden');
+        document.getElementById('tab-buy').classList.add('active');
+      } else if (tab === 'sell') {
+        document.getElementById('transactionSell').classList.remove('hidden');
+        document.getElementById('tab-sell').classList.add('active');
+      } else {
+        document.getElementById('transactionHistory').classList.remove('hidden');
+        document.getElementById('tab-history').classList.add('active');
+        renderTransactionHistory();
+      }
+    }
+
+    function saveTransaction(type) {
+      const isBuy = type === 'buy';
+      const product = document.getElementById(isBuy ? 'buyProduct' : 'sellProduct').value.trim();
+      const price = document.getElementById(isBuy ? 'buyPrice' : 'sellPrice').value.trim();
+      const items = document.getElementById(isBuy ? 'buyItems' : 'sellItems').value.trim();
+      const date = document.getElementById(isBuy ? 'buyDate' : 'sellDate').value.trim();
+
+      const msgBox = document.getElementById(isBuy ? 'buyMsg' : 'sellMsg');
+
+      if (!product || !price || !items || !date) {
+        msgBox.innerHTML = '<div style="padding:12px 14px;border-radius:12px;background:#fff3f3;color:#d95a5a;font-weight:700;">กรุณากรอกข้อมูลให้ครบ</div>';
+        return;
+      }
+
+      transactionHistory.unshift({
+        id: transactionHistory.length + 1,
+        date,
+        product,
+        items,
+        price: price.startsWith('฿') ? price : `฿${price}.00`,
+        type: isBuy ? 'Buy' : 'Sell',
+        buyer: isBuy ? (document.getElementById('buySupplier').value.trim() || 'Supplier') : (document.getElementById('sellCustomer').value.trim() || 'Customer'),
+        seller: 'Smart Warehouse Store',
+        contact: isBuy ? (document.getElementById('buyPhone').value.trim() || '-') : (document.getElementById('sellPhone').value.trim() || '-'),
+        zone: isBuy ? (document.getElementById('buyZone').value.trim() || '-') : (document.getElementById('sellZone').value.trim() || '-'),
+        shelf: isBuy ? (document.getElementById('buyShelf').value.trim() || '-') : (document.getElementById('sellShelf').value.trim() || '-'),
+        order: `${isBuy ? 'PO' : 'SO'}-${Math.floor(100000 + Math.random() * 900000)}`,
+        status: isBuy ? 'Recorded' : 'Pending Review'
+      });
+
+      msgBox.innerHTML = `<div style="padding:12px 14px;border-radius:12px;background:#eef7ff;color:#1f4e98;font-weight:700;">${isBuy ? 'บันทึกรายการรับเข้าสำเร็จ' : 'บันทึกรายการเบิกออกสำเร็จ'}</div>`;
+      renderTransactionHistory();
+      showTransactionTab('history');
+    }
+
+    function renderTransactionHistory() {
+      const body = document.getElementById('historyBody');
+      const keyword = (document.getElementById('historySearchInput')?.value || '').trim().toLowerCase();
+
+      let rows = transactionHistory;
+      if (keyword) {
+        rows = rows.filter(t =>
+          [t.product, t.order, t.date, t.type, t.zone, t.shelf].join(' ').toLowerCase().includes(keyword)
+        );
+      }
+
+      body.innerHTML = rows.map(t => {
+        const badge = t.type === 'Buy'
+          ? '<span class="badge badge-ok">Buy</span>'
+          : '<span class="badge badge-warn">Sell</span>';
+
+        return `
+          <tr onclick="openTransactionDetail(${t.id})" style="cursor:pointer;">
+            <td>${t.id}</td>
+            <td>${t.date}</td>
+            <td>
+              <div style="font-weight:700;color:#19344d;">${t.product}</div>
+              <div style="font-size:12px;color:#7b8ea3;">Click to view details</div>
+            </td>
+            <td>${t.items}</td>
+            <td>${t.price}</td>
+            <td>${badge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openTransactionDetail(id) {
+      const t = transactionHistory.find(x => x.id === id);
+      if (!t) return;
+
+      document.getElementById('detailOrder').textContent = t.order;
+      document.getElementById('detailDate').textContent = t.date;
+      document.getElementById('detailProduct').textContent = t.product;
+      document.getElementById('detailItems').textContent = t.items;
+      document.getElementById('detailPrice').textContent = t.price;
+      document.getElementById('detailType').textContent = t.type;
+      document.getElementById('detailBuyer').textContent = t.buyer;
+      document.getElementById('detailSeller').textContent = t.seller;
+      document.getElementById('detailContact').textContent = t.contact;
+      document.getElementById('detailZone').textContent = t.zone || '-';
+      document.getElementById('detailShelf').textContent = t.shelf || '-';
+      document.getElementById('detailStatus').textContent = t.status;
+
+      document.getElementById('transactionDetailModal').classList.remove('hidden');
+    }
+
+    function closeTransactionDetail() {
+      document.getElementById('transactionDetailModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
